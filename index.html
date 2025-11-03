@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Clientes e Projetos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>📋 Gestão de Card de Cliente</h1>
+    </header>
+
+    <main>
+        <section id="search-container" class="card">
+            <h2>🔎 Buscar / Criar Cliente</h2>
+            <div class="field-group">
+                <label for="search-input">Código ou Nome Cliente:</label>
+                <input type="text" id="search-input" placeholder="Digite Código ou Nome do Cliente">
+                <button id="search-btn">Buscar</button>
+                <button id="new-client-btn" style="background-color: #007bff;">Novo Cliente</button>
+            </div>
+            <p id="current-client-info" style="font-weight: bold; margin-top: 10px; color: #218838;">
+                Nenhum cliente carregado.
+            </p>
+               <div class="action-buttons" style="justify-content: flex-start; margin-top: 20px;">
+            <button type="button" id="show-reminders-btn" style="background-color: #ffc107; color: #333;">
+                🔔 Mostrar Lembretes Diários
+            </button>
+        </div>
+        </section>
+
+        <form id="client-form">
+            <input type="hidden" id="current-client-id">
+
+            <section class="card">
+                <h2>1. Dados do Cliente</h2>
+                <div class="field-group">
+                    <label for="data-inicio">Data de Início:</label>
+                    <input type="date" id="data-inicio" required>
+                </div>
+                <div class="field-group">
+                    <label for="codigo">Código (máx. 10):</label>
+                    <input type="text" id="codigo" maxlength="10" required>
+                    <label for="nome-cliente">Nome Cliente (máx. 50):</label>
+                    <input type="text" id="nome-cliente" maxlength="50" required>
+                </div>
+                <div class="field-group">
+                    <label for="nome-contato">Nome Contato (máx. 50):</label>
+                    <input type="text" id="nome-contato" maxlength="50">
+                    <label for="email">E-mail (máx. 100):</label>
+                    <input type="email" id="email" maxlength="100">
+                </div>
+                <div class="field-group">
+                    <label for="telefone-01">Telefone 01 (máx. 15):</label>
+                    <input type="text" id="telefone-01" maxlength="15">
+                    <label for="telefone-02">Telefone 02 (máx. 15):</label>
+                    <input type="text" id="telefone-02" maxlength="15">
+                </div>
+                 <div class="field-group">
+                    <label for="responsavel-implantacao">Responsável/Implantação (máx. 20):</label>
+                    <input type="text" id="responsavel-implantacao" maxlength="20">
+                    <label for="email-responsavel-implantacao">E-mail – Responsável/Implantação (máx. 100):</label>
+                    <input type="email" id="email-responsavel-implantacao" maxlength="100">
+                </div>
+                <div class="field-group">
+                    <label for="responsavel-tecnico">Responsável Técnico (máx. 20):</label>
+                    <input type="text" id="responsavel-tecnico" maxlength="20">
+                    <label for="email-responsavel-tecnico">E-mail – Responsável técnico (máx. 100):</label>
+                    <input type="email" id="email-responsavel-tecnico" maxlength="100">
+                </div>
+                <div class="field-group">
+                    <label for="responsavel-financeiro">Responsável Financeiro (máx. 20):</label>
+                    <input type="text" id="responsavel-financeiro" maxlength="20">
+                    <label for="email-responsavel-financeiro">E-mail – Responsável Financeiro (máx. 100):</label>
+                    <input type="email" id="email-responsavel-financeiro" maxlength="100">
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>2. Plano Contratado</h2>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="plano" value="basico"> Básico</label>
+                    <label><input type="checkbox" name="plano" value="pro"> Pró</label>
+                    <label><input type="checkbox" name="plano" value="enterprise"> Enterprise</label>
+                </div>
+                <div class="field-group">
+                    <label for="qtd-licencas">Quantidade de Licenças (máx. 10):</label>
+                    <input type="text" id="qtd-licencas" maxlength="10">
+                    <label for="licencas-utilizadas">Licenças Utilizadas (máx. 10):</label>
+                    <input type="text" id="licencas-utilizadas" maxlength="10">
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>3. Link e Resumo</h2>
+                <div class="field-group">
+                    <label for="link-pipefy">Link do PipeFY (máx. 100):</label>
+                    <input type="url" id="link-pipefy" maxlength="100">
+                </div>
+                <div class="field-group">
+                    <label for="resumo-solicitacao">Resumo/Solicitação (máx. 600):</label>
+                    <textarea id="resumo-solicitacao" maxlength="600" rows="4"></textarea>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h2>4. Resumo após Reunião</h2>
+                <div class="field-group">
+                    <label for="plano-acao">Plano de Ação (máx. 2000):</label>
+                    <textarea id="plano-acao" maxlength="2000" rows="6"></textarea>
+                </div>
+            </section>
+
+            <div class="action-buttons">
+                <button type="submit">Salvar Dados</button>
+                <button type="button" id="delete-btn" class="delete-button">Excluir Cliente</button>
+            </div>
+        </form>
+
+        <section id="tarefas-container" class="card">
+            <h2>5. Ações/Tarefas (Checklist)</h2>
+            <div id="tarefas-list">
+                </div>
+            <div class="field-group add-task">
+                <label for="nova-tarefa">Nova Tarefa:</label>
+                <input type="text" id="nova-tarefa" placeholder="Descrição da Tarefa">
+                <label for="tarefa-due-date">Prazo:</label>
+                <input type="date" id="tarefa-due-date">
+                <button id="add-tarefa-btn">Adicionar</button>
+            </div>
+        </section>
+
+        <section id="prazo-container" class="card">
+            <h2>6. Prazo de Conclusão</h2>
+            <p id="countdown-message">Tempo para conclusão deste card: <span>...</span></p>
+        </section>
+        
+     
+    </main>
+    
+    <div id="reminder-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Lembretes de Ações Pendentes para Hoje</h2>
+            <div id="reminders-list-output">
+                </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
