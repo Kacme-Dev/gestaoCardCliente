@@ -17,17 +17,22 @@
             <div class="field-group">
                 <label for="search-input">Código ou Nome Cliente:</label>
                 <input type="text" id="search-input" placeholder="Digite Código ou Nome do Cliente">
-                <button id="search-btn">Buscar</button>
+                
+                <button id="search-btn-direct" style="background-color: #007bff;">Buscar Cliente</button>
+                
+                <button id="search-btn-list" style="background-color: #0099cc;">Buscar (Lista)</button> 
+                
                 <button id="new-client-btn" style="background-color: #007bff;">Novo Cliente</button>
+                <button id="reset-client-btn" style="background-color: #bc0000;">Limpar</button>
             </div>
             <p id="current-client-info" style="font-weight: bold; margin-top: 10px; color: #218838;">
                 Nenhum cliente carregado.
             </p>
-               <div class="action-buttons" style="justify-content: flex-start; margin-top: 20px;">
-            <button type="button" id="show-reminders-btn" style="background-color: #ffc107; color: #333;">
-                🔔 Mostrar Lembretes Diários
-            </button>
-        </div>
+            <div class="action-buttons" style="justify-content: flex-start; margin-top: 20px;">
+                <button type="button" id="show-reminders-btn" style="background-color: #ffc107; color: #333;">
+                    🔔 Mostrar Lembretes Diários
+                </button>
+            </div>
         </section>
 
         <form id="client-form">
@@ -40,39 +45,39 @@
                     <input type="date" id="data-inicio" required>
                 </div>
                 <div class="field-group">
-                    <label for="codigo">Código (máx. 10):</label>
+                    <label for="codigo">Código:</label>
                     <input type="text" id="codigo" maxlength="10" required>
-                    <label for="nome-cliente">Nome Cliente (máx. 50):</label>
+                    <label for="nome-cliente">Nome Cliente:</label>
                     <input type="text" id="nome-cliente" maxlength="50" required>
                 </div>
                 <div class="field-group">
-                    <label for="nome-contato">Nome Contato (máx. 50):</label>
+                    <label for="nome-contato">Nome Contato:</label>
                     <input type="text" id="nome-contato" maxlength="50">
-                    <label for="email">E-mail (máx. 100):</label>
+                    <label for="email">E-mail:</label>
                     <input type="email" id="email" maxlength="100">
                 </div>
                 <div class="field-group">
-                    <label for="telefone-01">Telefone 01 (máx. 15):</label>
+                    <label for="telefone-01">Telefone 01:</label>
                     <input type="text" id="telefone-01" maxlength="15">
-                    <label for="telefone-02">Telefone 02 (máx. 15):</label>
+                    <label for="telefone-02">Telefone 02:</label>
                     <input type="text" id="telefone-02" maxlength="15">
                 </div>
                  <div class="field-group">
-                    <label for="responsavel-implantacao">Responsável/Implantação (máx. 20):</label>
+                    <label for="responsavel-implantacao">Resp./Implantação:</label>
                     <input type="text" id="responsavel-implantacao" maxlength="20">
-                    <label for="email-responsavel-implantacao">E-mail – Responsável/Implantação (máx. 100):</label>
+                    <label for="email-responsavel-implantacao">E-mail – Resp./Implantação:</label>
                     <input type="email" id="email-responsavel-implantacao" maxlength="100">
                 </div>
                 <div class="field-group">
-                    <label for="responsavel-tecnico">Responsável Técnico (máx. 20):</label>
+                    <label for="responsavel-tecnico">Resp. Técnico:</label>
                     <input type="text" id="responsavel-tecnico" maxlength="20">
-                    <label for="email-responsavel-tecnico">E-mail – Responsável técnico (máx. 100):</label>
+                    <label for="email-responsavel-tecnico">E-mail – Resp. técnico:</label>
                     <input type="email" id="email-responsavel-tecnico" maxlength="100">
-                </div>
+                </div> 
                 <div class="field-group">
-                    <label for="responsavel-financeiro">Responsável Financeiro (máx. 20):</label>
+                    <label for="responsavel-financeiro">Resp. Financeiro:</label>
                     <input type="text" id="responsavel-financeiro" maxlength="20">
-                    <label for="email-responsavel-financeiro">E-mail – Responsável Financeiro (máx. 100):</label>
+                    <label for="email-responsavel-financeiro">E-mail – Resp. Financeiro:</label>
                     <input type="email" id="email-responsavel-financeiro" maxlength="100">
                 </div>
             </section>
@@ -85,9 +90,9 @@
                     <label><input type="checkbox" name="plano" value="enterprise"> Enterprise</label>
                 </div>
                 <div class="field-group">
-                    <label for="qtd-licencas">Quantidade de Licenças (máx. 10):</label>
+                    <label for="qtd-licencas">Quantidade de Licenças:</label>
                     <input type="text" id="qtd-licencas" maxlength="10">
-                    <label for="licencas-utilizadas">Licenças Utilizadas (máx. 10):</label>
+                    <label for="licencas-utilizadas">Licenças Utilizadas:</label>
                     <input type="text" id="licencas-utilizadas" maxlength="10">
                 </div>
             </section>
@@ -95,7 +100,7 @@
             <section class="card">
                 <h2>3. Link e Resumo</h2>
                 <div class="field-group">
-                    <label for="link-pipefy">Link do PipeFY (máx. 100):</label>
+                    <label for="link-pipefy">Link do PipeFY:</label>
                     <input type="url" id="link-pipefy" maxlength="100">
                 </div>
                 <div class="field-group">
@@ -122,12 +127,18 @@
             <h2>5. Ações/Tarefas (Checklist)</h2>
             <div id="tarefas-list">
                 </div>
+            
             <div class="field-group add-task">
                 <label for="nova-tarefa">Nova Tarefa:</label>
                 <input type="text" id="nova-tarefa" placeholder="Descrição da Tarefa">
+                <label for="hora-tarefa">Hora:</label>
+                <input type="time" id="hora-tarefa" placeholder="Hora da Tarefa" style="max-width: 150px;">
+            </div>
+            
+            <div class="field-group add-task-controls"> 
                 <label for="tarefa-due-date">Prazo:</label>
-                <input type="date" id="tarefa-due-date">
-                <button id="add-tarefa-btn">Adicionar</button>
+                <input type="date" id="tarefa-due-date" style="max-width: 200px;">
+                <button id="add-tarefa-btn" style="flex-grow: 0;">Adicionar</button>
             </div>
         </section>
 
@@ -136,15 +147,39 @@
             <p id="countdown-message">Tempo para conclusão deste card: <span>...</span></p>
         </section>
         
-     
     </main>
     
     <div id="reminder-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn">&times;</span>
+            <span class="close-btn" id="reminder-close-btn">&times;</span>
             <h2>Lembretes de Ações Pendentes para Hoje</h2>
-            <div id="reminders-list-output">
+            <div id="reminders-list-output"></div>
+        </div>
+    </div>
+
+    <div id="client-list-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="list-close-btn">&times;</span>
+            <h2>Escolha um Cliente</h2>
+            <div id="client-list-output">
                 </div>
+            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button id="clear-list-selection-btn" style="background-color: #f0ad4e;">Limpar Seleção</button>
+                <button id="back-to-main-btn" style="background-color: #337ab7;">Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="task-summary-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="summary-close-btn">&times;</span>
+            <h2 id="summary-client-name">Tarefas do Cliente: [Nome]</h2>
+            <div id="summary-tasks-output">
+                </div>
+            <div style="margin-top: 20px; text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
+                <button id="load-for-edit-btn" style="background-color: #28a745;">Carregar para Edição</button>
+                <button id="exit-task-summary-btn" class="delete-button">Sair</button>
+            </div>
         </div>
     </div>
 

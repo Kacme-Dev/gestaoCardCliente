@@ -51,6 +51,7 @@ h2 {
 .field-group input[type="email"],
 .field-group input[type="url"],
 .field-group input[type="date"],
+.field-group input[type="time"],
 .field-group textarea {
     flex-grow: 1;
     padding: 8px;
@@ -109,21 +110,72 @@ button:hover {
     border-bottom: 2px solid #b3e0ff;
 }
 
-#search-btn, #new-client-btn {
+#search-btn-direct, #search-btn-list, #new-client-btn {
     padding: 8px 12px;
     margin-top: 0;
 }
 
-/* Estilo específico para tarefas */
+/* --- Estilo de Layout da Seção de Tarefas --- */
+
+/* Estilo para a segunda linha de controles de tarefa */
+.add-task-controls {
+    justify-content: flex-start; 
+    gap: 20px; 
+}
+
+.add-task-controls label {
+    min-width: 80px; 
+}
+
+.add-task-controls button {
+    flex-grow: 0;
+    margin-left: auto; 
+}
+
+/* --- Estilo de Status de Tarefas --- */
+
+/* Estilo para tarefas CONCLUÍDAS (Archived/Arquivada) */
+.completed-task {
+    text-decoration: line-through;
+    opacity: 0.7; 
+    background-color: #e2f0d9 !important; /* Verde claro */
+    border-left: 5px solid #28a745 !important;
+}
+
+/* Estilo para tarefas EM ATRASO (Overdue) */
+.overdue-task {
+    background-color: #f8d7da !important; /* Vermelho claro */
+    border-left: 5px solid #dc3545 !important;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Refina o estilo da lista de tarefas para melhor visualização dos bordes */
 #tarefas-list div {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px dashed #eee;
+    padding: 10px; 
+    margin-bottom: 5px; 
+    border: 1px solid #eee; 
+    border-radius: 4px;
+    background-color: #fff; 
 }
 
-/* NOVO: Estilos do Modal (Popup) */
+/* Mantém o estilo do botão de exclusão X */
+.delete-task-btn {
+    background-color: #aaa;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 50%;
+    font-size: 12px;
+}
+.delete-task-btn:hover {
+    background-color: #dc3545;
+}
+
+/* --- Estilos dos Modais (Popups) --- */
+
 .modal {
     display: none; 
     position: fixed; 
@@ -171,42 +223,18 @@ button:hover {
     border-radius: 4px;
 }
 
-/* Estilo para tarefas CONCLUÍDAS (Archived/Arquivada) */
-.completed-task {
-    text-decoration: line-through;
-    opacity: 0.7; /* Suaviza a tarefa concluída */
-    background-color: #e2f0d9 !important; /* Verde claro */
-    border-left: 5px solid #28a745 !important;
-}
-
-/* Estilo para tarefas EM ATRASO (Overdue) */
-.overdue-task {
-    background-color: #f8d7da !important; /* Vermelho claro */
-    border-left: 5px solid #dc3545 !important;
-    font-weight: bold;
-    color: #333;
-}
-
-/* Refina o estilo da lista de tarefas para melhor visualização dos bordes */
-#tarefas-list div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px; /* Aumentei o padding */
-    margin-bottom: 5px; /* Espaçamento entre tarefas */
-    border: 1px solid #eee; /* Borda leve */
+/* Estilo para itens na lista de clientes */
+.client-list-item {
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #ddd;
+    border-left: 5px solid #0099cc;
     border-radius: 4px;
-    background-color: #fff; /* Fundo branco padrão */
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-/* Mantém o estilo do botão de exclusão X */
-.delete-task-btn {
-    background-color: #aaa;
-    color: white;
-    padding: 3px 8px;
-    border-radius: 50%;
-    font-size: 12px;
-}
-.delete-task-btn:hover {
-    background-color: #dc3545;
+.client-list-item:hover {
+    background-color: #e9f7ff;
+    font-weight: bold;
 }

@@ -13,22 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- Utilidade ---
 
-/** Retorna a data de hoje no formato YYYY-MM-DD para comparação. */
 function getTodayDateString() {
     const now = new Date();
-    // Ajusta o fuso horário para garantir a data correta
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
 
-/** Novo: Verifica se a tarefa está pendente e o prazo já passou. */
 function isTaskOverdue(tarefa) {
     if (tarefa.concluida || !tarefa.due_date) {
         return false;
     }
-    // A tarefa está em atraso se o prazo for anterior ao dia de hoje
     return tarefa.due_date < getTodayDateString(); 
 }
 
@@ -48,13 +44,11 @@ function searchClient(query) {
     const q = query.toLowerCase().trim();
     if (!q) return null;
 
-    // 1. Tenta buscar por Código exato (Maior prioridade)
     let foundClient = clients.find(client => client.codigo.toLowerCase() === q);
     if (foundClient) {
         return foundClient;
     }
     
-    // 2. Tenta buscar por Nome do Cliente (que contenha a query)
     foundClient = clients.find(client => 
         client['nome-cliente'].toLowerCase().includes(q)
     );
@@ -67,7 +61,6 @@ function loadClientData(client) {
     document.getElementById('current-client-id').value = client.codigo;
     document.getElementById('current-client-info').textContent = `Cliente Carregado: ${client.codigo} - ${client['nome-cliente']}`;
     
-    // 1. Preencher Formulário
     const form = document.getElementById('client-form');
     form.querySelectorAll('input, textarea').forEach(element => {
         const key = element.id;
@@ -82,13 +75,12 @@ function loadClientData(client) {
         checkbox.checked = client.planos && client.planos.includes(checkbox.value);
     });
 
-    // 2. Carregar Tarefas (ESTA FUNÇÃO GARANTE A EXIBIÇÃO)
     loadTarefas(client.tarefas || []); 
 
-    // 3. Atualizar Contador 
     updateCountdown(client['data-inicio']);
 }
 
+/** Limpa a tela e o estado atual (Botões Limpar/Novo Cliente) */
 function clearFormData() {
     currentClientId = null;
     clientTarefas = []; 
@@ -153,11 +145,30 @@ function saveOrUpdateClient() {
 }
 
 function deleteCurrentClient() {
-    // ... (função inalterada) ...
+    if (!currentClientId) {
+        alert("Nenhum cliente carregado para exclusão.");
+        return;
+    }
+
+    const client = clients.find(c => c.codigo === currentClientId);
+    if (!client) return;
+
+    const confirmation = confirm(`Tem certeza que deseja EXCLUIR o cadastro do cliente: ${client['nome-cliente']} (${currentClientId})? \n\n Esta ação não pode ser desfeita.`);
+
+    if (confirmation) {
+        const indexToDelete = clients.findIndex(c => c.codigo === currentClientId);
+        
+        if (indexToDelete !== -1) {
+            clients.splice(indexToDelete, 1);
+            saveAllClients();
+            clearFormData();
+            alert(`Cliente ${currentClientId} excluído com sucesso!`);
+        }
+    } 
 }
 
 
-// --- Gerenciamento de Ações/Tarefas (Checklist) ---
+// --- Gerenciamento de Ações/Tarefas ---
 
 function loadTarefas(tarefasArray) {
     clientTarefas = tarefasArray;
@@ -181,20 +192,18 @@ function renderTarefas() {
     clientTarefas.forEach((tarefa, index) => {
         const itemDiv = document.createElement('div');
         
-        // NOVO: Define a classe de estilo com base no status
         let statusClass = '';
         if (tarefa.concluida) {
             statusClass = 'completed-task';
         } else if (isTaskOverdue(tarefa)) {
-            statusClass = 'overdue-task'; // EM ATRASO
+            statusClass = 'overdue-task';
         }
         itemDiv.className = statusClass;
         
-        // Verifica a data para exibição
+        const timeText = tarefa.hora_tarefa ? ` às ${tarefa.hora_tarefa}` : ''; 
         const prazoText = tarefa.due_date ? 
-            `<span style="font-weight: normal; margin-left: 10px;">Prazo: ${new Date(tarefa.due_date).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</span>` : '';
+            `<span style="font-weight: normal; margin-left: 10px;">Prazo: ${new Date(tarefa.due_date).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}${timeText}</span>` : '';
 
-        // Texto do Status
         let statusDisplay = '';
         if (tarefa.concluida) {
             statusDisplay = ' (CONCLUÍDO/ARQUIVADO)';
@@ -208,7 +217,6 @@ function renderTarefas() {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.checked = tarefa.concluida;
-        // O checkbox atua como o botão "Concluído" ou "A Fazer"
         checkbox.addEventListener('change', () => {
             toggleTarefa(index);
             saveTarefas(); 
@@ -235,9 +243,11 @@ function renderTarefas() {
 
 function addTarefa() {
     const input = document.getElementById('nova-tarefa');
+    const timeInput = document.getElementById('hora-tarefa'); 
     const dateInput = document.getElementById('tarefa-due-date');
     const descricao = input.value.trim();
     const dueDate = dateInput.value; 
+    const dueTime = timeInput.value; 
 
     if (!currentClientId) {
         alert("Você deve carregar ou cadastrar um cliente antes de adicionar tarefas.");
@@ -248,9 +258,11 @@ function addTarefa() {
         clientTarefas.push({ 
             descricao, 
             concluida: false,
-            due_date: dueDate 
+            due_date: dueDate,
+            hora_tarefa: dueTime 
         });
         input.value = '';
+        timeInput.value = ''; 
         dateInput.value = ''; 
         saveTarefas(); 
         renderTarefas();
@@ -261,14 +273,13 @@ function toggleTarefa(index) {
     if (clientTarefas[index]) {
         clientTarefas[index].concluida = !clientTarefas[index].concluida;
     }
-    // Chame renderTarefas aqui para que a mudança de estilo seja instantânea
     renderTarefas();
 }
 
 function deleteTarefa(index) {
     if (confirm("Tem certeza que deseja excluir esta tarefa?")) {
         clientTarefas.splice(index, 1);
-        renderTarefas(); // Atualiza a lista após exclusão
+        renderTarefas(); 
     }
 }
 
@@ -282,7 +293,6 @@ function showDailyReminders() {
 
     clients.forEach(client => {
         if (client.tarefas && client.tarefas.length > 0) {
-            // Filtra tarefas que não estão concluídas e que tem o prazo hoje OU estão em atraso
             const pendingOrOverdueTasks = client.tarefas.filter(t => 
                 !t.concluida && (t.due_date === today || isTaskOverdue(t))
             );
@@ -296,7 +306,8 @@ function showDailyReminders() {
                         ${pendingOrOverdueTasks.map(t => {
                             const status = isTaskOverdue(t) ? ' (EM ATRASO)' : ' (HOJE)';
                             const prazo = t.due_date ? new Date(t.due_date).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : 'Sem Prazo';
-                            return `<li>${t.descricao} <span style="color: #dc3545;">${status}</span> - Prazo: ${prazo}</li>`;
+                            const hora = t.hora_tarefa ? ` às ${t.hora_tarefa}` : ''; 
+                            return `<li>${t.descricao} <span style="color: #dc3545;">${status}</span> - Prazo: ${prazo}${hora}</li>`;
                         }).join('')}
                     </ul>
                 `;
@@ -309,80 +320,240 @@ function showDailyReminders() {
         remindersList.innerHTML = '<p style="color: #888;">Nenhuma ação de trabalho pendente com prazo para hoje ou em atraso.</p>';
     }
 
-    const modal = document.getElementById('reminder-modal');
+    document.getElementById('reminder-modal').style.display = 'block';
+}
+
+// --- Contador Regressivo (Item 6) ---
+
+function updateCountdown(dataInicioStr) {
+    const countdownMessage = document.getElementById('countdown-message').querySelector('span');
+
+    if (!dataInicioStr) {
+        countdownMessage.textContent = "Data de Início não informada.";
+        document.getElementById('data-inicio').value = ''; 
+        return;
+    }
+
+    const dataInicio = new Date(dataInicioStr);
+    
+    const prazoTotalDias = 30; 
+    const dataAlvo = new Date(dataInicio.getTime());
+    dataAlvo.setDate(dataAlvo.getDate() + prazoTotalDias);
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0); 
+    dataAlvo.setHours(0, 0, 0, 0);
+
+    const diffTime = dataAlvo.getTime() - hoje.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+    if (diffDays > 0) {
+        countdownMessage.textContent = `${diffDays} dias restantes para o prazo final (${new Date(dataAlvo).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}).`;
+    } else if (diffDays === 0) {
+        countdownMessage.textContent = "Prazo final é hoje! (0 dias restantes).";
+    } else {
+        countdownMessage.textContent = `Prazo EXCEDIDO em ${Math.abs(diffDays)} dias.`;
+    }
+}
+
+// --- Lógica do Modal de Lista e Resumo de Tarefas ---
+
+function showClientListModal() {
+    const modal = document.getElementById('client-list-modal');
+    const listOutput = document.getElementById('client-list-output');
+    listOutput.innerHTML = ''; 
+
+    if (clients.length === 0) {
+        listOutput.innerHTML = '<p>Nenhum cliente cadastrado ainda.</p>';
+    } else {
+        const ul = document.createElement('ul');
+        ul.style.listStyle = 'none';
+        ul.style.padding = '0';
+
+        clients.forEach(client => {
+            const li = document.createElement('li');
+            li.className = 'client-list-item';
+            li.dataset.clientId = client.codigo;
+            li.textContent = `${client.codigo} - ${client['nome-cliente']}`;
+            
+            li.addEventListener('click', () => showTaskSummary(client.codigo));
+            
+            ul.appendChild(li);
+        });
+        listOutput.appendChild(ul);
+    }
     modal.style.display = 'block';
 }
 
-// --- Lógica do Modal / Event Listeners ---
-// ... (restante do código setupModalListeners e setupEventListeners inalterado) ...
-function setupModalListeners() {
-    const modal = document.getElementById('reminder-modal');
-    const closeBtn = document.querySelector('.close-btn');
+/** Exibe o modal de resumo de TODAS as tarefas (Atrasadas, A Fazer e Concluídas). */
+function showTaskSummary(codigo) {
+    const client = clients.find(c => c.codigo === codigo);
+    if (!client) return;
 
-    // Fecha ao clicar no X
-    closeBtn.onclick = function() {
-        modal.style.display = 'none';
+    const summaryModal = document.getElementById('task-summary-modal');
+    const summaryOutput = document.getElementById('summary-tasks-output');
+    const summaryTitle = document.getElementById('summary-client-name');
+    const loadButton = document.getElementById('load-for-edit-btn');
+
+    summaryTitle.textContent = `Tarefas de ${client['nome-cliente']} (${client.codigo})`;
+    summaryOutput.innerHTML = '';
+    
+    // Configura o botão "Carregar para Edição"
+    loadButton.onclick = () => {
+        loadClientData(client); // Carrega os dados no formulário
+        summaryModal.style.display = 'none'; // Fecha o modal
+    };
+    
+    const allTasks = client.tarefas || [];
+    
+    // 1. FILTRAGEM
+    const overdueTasks = allTasks.filter(t => isTaskOverdue(t));
+    const pendingTasks = allTasks.filter(t => !t.concluida && !isTaskOverdue(t));
+    const completedTasks = allTasks.filter(t => t.concluida);
+
+    // 2. MONTAGEM DO CONTEÚDO HTML
+    let htmlContent = '';
+    
+    // A. ATRASADAS
+    if (overdueTasks.length > 0) {
+        htmlContent += `<h3>❌ ATRASADAS (${overdueTasks.length})</h3>`;
+        htmlContent += `<ul style="color: #dc3545; list-style-type: none;">`;
+        overdueTasks.forEach(t => {
+            const prazo = t.due_date ? new Date(t.due_date).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : 'Sem Prazo';
+            htmlContent += `<li style="margin-bottom: 5px;">• ${t.descricao} (Prazo: ${prazo})</li>`;
+        });
+        htmlContent += `</ul>`;
     }
 
-    // Fecha ao clicar fora do modal
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
+    // B. A FAZER (PENDENTES)
+    if (pendingTasks.length > 0) {
+        htmlContent += `<h3>⚠️ A FAZER (${pendingTasks.length})</h3>`;
+        htmlContent += `<ul style="list-style-type: none;">`;
+        pendingTasks.forEach(t => {
+            const prazo = t.due_date ? new Date(t.due_date).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : 'Sem Prazo';
+            const hora = t.hora_tarefa ? ` às ${t.hora_tarefa}` : '';
+            htmlContent += `<li style="margin-bottom: 5px;">• ${t.descricao} (Prazo: ${prazo}${hora})</li>`;
+        });
+        htmlContent += `</ul>`;
     }
+    
+    // C. CONCLUÍDAS
+    if (completedTasks.length > 0) {
+        htmlContent += `<h3>✅ CONCLUÍDAS/ARQUIVADAS (${completedTasks.length})</h3>`;
+        htmlContent += `<ul style="color: #28a745; opacity: 0.8; list-style-type: none;">`;
+        completedTasks.forEach(t => {
+            const prazo = t.due_date ? new Date(t.due_date).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : 'S/P';
+            htmlContent += `<li style="margin-bottom: 5px;">• ${t.descricao} (Prazo Original: ${prazo})</li>`;
+        });
+        htmlContent += `</ul>`;
+    }
+    
+    if (allTasks.length === 0) {
+        htmlContent = '<p>Nenhuma tarefa cadastrada para este cliente.</p>';
+    }
+
+    summaryOutput.innerHTML = htmlContent;
+
+    summaryModal.style.display = 'block';
+    document.getElementById('client-list-modal').style.display = 'none'; // Fecha a lista
 }
 
 
 // --- Configuração de Eventos ---
 
+function setupModalListeners() {
+    // Vincular fechamento do X com os IDs corretos
+    document.querySelector('#reminder-modal .close-btn').onclick = function() {
+        document.getElementById('reminder-modal').style.display = 'none';
+    }
+    document.getElementById('list-close-btn').onclick = function() {
+        document.getElementById('client-list-modal').style.display = 'none';
+    }
+    document.getElementById('summary-close-btn').onclick = function() {
+        document.getElementById('task-summary-modal').style.display = 'none';
+    }
+    
+    // Fechamento genérico ao clicar fora
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('reminder-modal')) {
+            document.getElementById('reminder-modal').style.display = 'none';
+        }
+        if (event.target == document.getElementById('client-list-modal')) {
+            document.getElementById('client-list-modal').style.display = 'none';
+        }
+        if (event.target == document.getElementById('task-summary-modal')) {
+            document.getElementById('task-summary-modal').style.display = 'none';
+        }
+    }
+}
+
+/** NOVO: Lógica da Busca Direta */
+function handleDirectSearch() {
+    const searchInput = document.getElementById('search-input');
+    const query = searchInput.value;
+    const foundClient = searchClient(query);
+
+    if (foundClient) {
+        loadClientData(foundClient);
+        document.getElementById('codigo').value = foundClient.codigo;
+        searchInput.value = ''; 
+    } else {
+        alert(`Cliente não encontrado para a busca: "${query}". Limpando formulário para novo cadastro.`);
+        clearFormData();
+    }
+}
+
+
 function setupEventListeners() {
     setupModalListeners();
     
-    // 1. Salvar dados 
+    // 1. Salvar dados (Botão Salvar Dados)
     document.getElementById('client-form').addEventListener('submit', (e) => {
         e.preventDefault();
         saveOrUpdateClient();
     });
 
-    // 2. Buscar Cliente (REVISADO: Usa a nova lógica de busca com prioridade por Código)
-    const searchButton = document.getElementById('search-btn');
+    // 2. Buscar Cliente (Botão Buscar/Lista)
+    document.getElementById('search-btn-list').addEventListener('click', showClientListModal); 
+
+    // 3. NOVO EVENTO: Botão Buscar Cliente (Busca Direta)
+    document.getElementById('search-btn-direct').addEventListener('click', handleDirectSearch);
+
+    // 4. Busca Rápida por Input (ENTER no campo)
     const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleDirectSearch(); 
+            }
+        });
+    }
 
-    const handleSearch = () => {
-        const query = searchInput.value;
-        const foundClient = searchClient(query);
-
-        if (foundClient) {
-            loadClientData(foundClient);
-            document.getElementById('codigo').value = foundClient.codigo;
-            searchInput.value = ''; 
-        } else {
-            alert(`Cliente não encontrado para a busca: "${query}". Limpando formulário para novo cadastro.`);
-            clearFormData();
-        }
-    };
-
-    searchButton.addEventListener('click', handleSearch);
-
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            handleSearch();
-        }
-    });
-
-    // 3. Novo Cliente
-    document.getElementById('new-client-btn').addEventListener('click', () => {
-        clearFormData();
-    });
-
-    // 4. Excluir Cliente 
+    // 5. Botões de Ação Principal (Novo Cliente, Limpar, Excluir)
+    document.getElementById('new-client-btn').addEventListener('click', clearFormData);
+    document.getElementById('reset-client-btn').addEventListener('click', clearFormData);
     document.getElementById('delete-btn').addEventListener('click', deleteCurrentClient);
 
-    // 5. Adicionar tarefa
+    // 6. Botões de Navegação do Modal de Lista de Clientes
+    document.getElementById('clear-list-selection-btn').addEventListener('click', () => {
+        document.getElementById('client-list-modal').style.display = 'none';
+        clearFormData(); 
+    });
+    
+    document.getElementById('back-to-main-btn').addEventListener('click', () => {
+        document.getElementById('client-list-modal').style.display = 'none';
+    });
+    
+    // 7. Botão Sair do Modal de Resumo de Tarefas
+    document.getElementById('exit-task-summary-btn').addEventListener('click', () => {
+        document.getElementById('task-summary-modal').style.display = 'none';
+        showClientListModal(); 
+    });
+
+    // 8. Ações/Tarefas (Adicionar)
     document.getElementById('add-tarefa-btn').addEventListener('click', addTarefa);
 
-    // 6. Adicionar tarefa com Enter
     document.getElementById('nova-tarefa').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -390,6 +561,6 @@ function setupEventListeners() {
         }
     });
     
-    // 7. Mostrar Lembretes Diários
+    // 9. Mostrar Lembretes Diários
     document.getElementById('show-reminders-btn').addEventListener('click', showDailyReminders);
 }
